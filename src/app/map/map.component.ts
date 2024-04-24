@@ -73,7 +73,7 @@ export class MapComponent implements OnInit {
 
     var customIcon = L.icon({
       iconUrl: '../../../assets/images/iconoCoche.png',
-      iconSize: [42, 42],
+      iconSize: [48, 48],
       iconAnchor: [16, 16],
       popupAnchor: [0, -16],
     });
@@ -82,8 +82,14 @@ export class MapComponent implements OnInit {
       'Códigos Postales': layerCodigosPostales,
       Direcciones: layerIGNDirecciones,
     };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
     this.map = L.map('map')
-      .setView([39.4699, -0.3763], 11)
+      .setView([latitude, longitude], 13)
       .addLayer(baseMapLayer);
 
     L.control
@@ -94,9 +100,15 @@ export class MapComponent implements OnInit {
       })
       .addTo(this.map);
 
-    L.marker([39.4699, -0.3763], { icon: customIcon })
+    L.marker([latitude, longitude], { icon: customIcon })
       .addTo(this.map)
       .bindPopup('Usted se encuentra aquí')
       .openPopup();
+    }, error => {
+      console.error('Error al obtener la ubicación del usuario:', error);
+    });
+  } else {
+    console.error('Geolocalización no es compatible con este navegador.');
   }
+}
 }
